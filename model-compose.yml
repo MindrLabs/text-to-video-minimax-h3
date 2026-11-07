@@ -1,0 +1,85 @@
+controller:
+  adapter:
+    type: http-server
+    port: ${env.PORT | 8080}
+    base_path: /api
+  webui:
+    driver: gradio
+    port: ${env.SERVER_PORT | 8081}
+
+workflows:
+  - id: generate-bf16
+    title: MiniMax-H3 Text-to-Video (bf16)
+    description: Generate a short clip with native stereo audio from a text prompt using MiniMax-H3.
+    job:
+      component: minimax-h3-bf16
+      input: ${input}
+      output: ${output}
+
+    output: ${jobs.__job__.output}
+
+  - id: generate-fp8
+    title: MiniMax-H3 Text-to-Video (fp8)
+    description: Generate a short clip with native stereo audio from a text prompt using MiniMax-H3.
+    job:
+      component: minimax-h3-fp8
+      input: ${input}
+      output: ${output}
+
+    output: ${jobs.__job__.output}
+
+components:
+  - id: minimax-h3-bf16
+    type: model
+    task: text-to-video
+    driver: custom
+    family: minimax-h3
+    model:
+      provider: huggingface
+      repository: MiniMaxAI/MiniMax-H3
+      allow_patterns: [ "model_index.json", "modular_model_index.json", "scheduler/*", "audio_scheduler/*", "transformer/*", "text_encoder/*", "tokenizer/*", "processor/*", "vae/*", "audio_vae/*" ]
+    device: ${env.MINIMAX_DEVICE | cuda}
+    cpu_offload: true
+    max_concurrent_count: 1
+    runtime:
+      type: virtualenv
+      driver: python
+      path: .venv/minimax-h3-bf16
+    action:
+      prompt: ${input.prompt}
+      seed: ${input.seed as integer}
+      width: 1280
+      height: 640
+      frame_rate: 24
+      params:
+        num_frames: 124
+        inference_steps: 50
+      output: ${result as video/mp4}
+
+  - id: minimax-h3-fp8
+    type: model
+    task: text-to-video
+    driver: custom
+    family: minimax-h3
+    model:
+      provider: huggingface
+      repository: MiniMaxAI/MiniMax-H3
+      allow_patterns: [ "model_index.json", "modular_model_index.json", "scheduler/*", "audio_scheduler/*", "transformer/*", "text_encoder/*", "tokenizer/*", "processor/*", "vae/*", "audio_vae/*" ]
+    device: ${env.MINIMAX_DEVICE | cuda}
+    quantization: fp8
+    cpu_offload: false
+    max_concurrent_count: 1
+    runtime:
+      type: virtualenv
+      driver: python
+      path: .venv/minimax-h3-fp8
+    action:
+      prompt: ${input.prompt}
+      seed: ${input.seed as integer}
+      width: 1280
+      height: 640
+      frame_rate: 24
+      params:
+        num_frames: 124
+        inference_steps: 50
+      output: ${result as video/mp4}
