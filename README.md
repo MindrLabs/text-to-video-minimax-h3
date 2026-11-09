@@ -2,7 +2,7 @@
 
 # text-to-video-minimax-h3
 
-This service takes an English prompt and returns a short video file with sound, made with MiniMaxAI/MiniMax-H3.
+This service takes a text prompt and returns a short video file with sound, made with MiniMaxAI/MiniMax-H3.
 
 ![A web page where a prompt describing a classroom scene returns a video of a student on a desk by the window throwing a paper airplane.](docs/images/demo.gif)
 

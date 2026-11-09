@@ -2,7 +2,7 @@
 
 # text-to-video-minimax-h3
 
-这个服务接收英文提示词，用 MiniMaxAI/MiniMax-H3 生成带声音的短视频，并以视频文件返回。
+这个服务接收文本提示词，用 MiniMaxAI/MiniMax-H3 生成带声音的短视频，并以视频文件返回。
 
 ![在网页中输入描写教室场景的提示词，得到学生坐在窗边课桌上扔出纸飞机的视频。](docs/images/demo.gif)
 
